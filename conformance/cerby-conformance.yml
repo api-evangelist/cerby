@@ -1,0 +1,144 @@
+generated: '2026-08-09'
+method: searched
+source: https://developer.cerby.com/
+note: >-
+  Cerby publishes no OpenAPI document, so every assertion below is read from the
+  published developer portal and help-center articles rather than derived from a
+  spec. `conforms: false` means we found no published evidence, not that we
+  tested and it failed.
+standards:
+- id: scim2
+  name: SCIM 2.0 (RFC 7643/7644)
+  conforms: true
+  evidence: >-
+    Cerby exposes a SCIM tenant endpoint at https://api.cerby.com/v1/scim/v2 and
+    documents automatic user and group provisioning from Okta, Microsoft Entra
+    ID, and OneLogin. Microsoft publishes a Cerby provisioning tutorial for
+    Entra ID.
+  docs: https://help.cerby.com/setup-and-admin/workspace-identity-federation/retrieve-the-scim-api-authentication-token-from-cerby
+- id: saml2
+  name: SAML 2.0
+  conforms: true
+  evidence: >-
+    Workspace identity federation is documented for Okta, Entra ID, and
+    OneLogin; API keys can only be generated after authenticating through the
+    corporate IdP.
+  docs: https://help.cerby.com/setup-and-admin/workspace-identity-federation
+- id: json-api
+  name: 'JSON:API'
+  conforms: partial
+  evidence: >-
+    Response envelope uses the JSON:API vocabulary — a data object with
+    id/type/attributes, a links object with self/next/previous, a meta object,
+    page[number]/page[size] pagination, filter[...] filtering, and a top-level
+    errors array. Cerby does not claim JSON:API conformance and does not serve
+    the application/vnd.api+json media type; the content type is application/json.
+- id: rfc9457-problem-details
+  name: RFC 9457 Problem Details
+  conforms: false
+  evidence: >-
+    Errors are returned as application/json with a custom errors[] envelope
+    (code/title/detail/status/meta). No application/problem+json media type and
+    no dereferenceable type URI.
+- id: oauth2
+  name: OAuth 2.0
+  conforms: false
+  evidence: >-
+    The public API authenticates with a scoped X-API-Key header. No
+    authorization endpoint, token endpoint, or oauth2 flow is published for API
+    access, and /.well-known/oauth-authorization-server returns 404 on every
+    Cerby host probed.
+- id: oidc
+  name: OpenID Connect
+  conforms: false
+  evidence: >-
+    /.well-known/openid-configuration returns 404 on www.cerby.com, api.cerby.com,
+    app.cerby.com, and docs.cerby.com. Cerby CONSUMES OIDC/SAML from customer
+    IdPs but does not publish a discovery document of its own.
+- id: rfc9116-security-txt
+  name: RFC 9116 security.txt
+  conforms: false
+  evidence: /.well-known/security.txt returns 404 on all seven Cerby hosts probed.
+- id: rfc8615-well-known
+  name: RFC 8615 well-known URIs
+  conforms: false
+  evidence: No /.well-known/ document was found on any Cerby host.
+- id: rfc8594-sunset
+  name: RFC 8594 Sunset header
+  conforms: false
+  evidence: No deprecation or sunset policy and no Sunset/Deprecation header support is documented.
+- id: openapi
+  name: OpenAPI
+  conforms: false
+  evidence: >-
+    The developer portal states the API "follows RESTful principles and the
+    OpenAPI 3.0 Specifications", but no OpenAPI document is published. Probed
+    /openapi.json, /openapi.yaml, /swagger.json, /v1/openapi.json, /api-docs,
+    /docs and /redoc on api.cerby.com (all 404) and on docs.cerby.com and
+    developer.cerby.com (all 404 from the origin bucket). The reference is a
+    Slate-generated static HTML page with no downloadable spec.
+  gap: true
+- id: asyncapi
+  name: AsyncAPI
+  conforms: false
+  evidence: >-
+    A complete prose webhook contract is published — envelope, signature,
+    21 event types, retry policy — but no AsyncAPI document. Probed
+    /asyncapi.yaml on api.cerby.com and help.cerby.com (404).
+  gap: true
+- id: webhook-signing
+  name: Signed webhook delivery
+  conforms: true
+  evidence: >-
+    Ed25519 and HMAC-SHA256 signatures over <timestamp_ms>.<raw_body>, a
+    five-minute skew window, key IDs, a public key retrieval endpoint, 24-hour
+    dual-signed key rotation, and CI-tested reference verifiers in Python and
+    Node.js.
+  docs: https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver
+- id: idempotency
+  name: Idempotency keys
+  conforms: partial
+  evidence: >-
+    An Idempotency-Key header plus documented per-delivery and per-event dedup
+    keys and at-least-once semantics on the WEBHOOK surface. No idempotency key
+    is documented for REST writes.
+  see: conventions/cerby-conventions.yml
+- id: rfc3339
+  name: RFC 3339 timestamps
+  conforms: true
+  evidence: occurred_at and X-Cerby-Signature-Timestamp are RFC 3339 UTC with millisecond precision.
+- id: uuidv7
+  name: UUIDv7 identifiers
+  conforms: true
+  evidence: Webhook event_id is documented as UUIDv7.
+- id: llmstxt
+  name: llms.txt
+  conforms: true
+  evidence: >-
+    https://help.cerby.com/llms.txt returns 200 with a 181KB documentation index
+    (777 entries), and every help-center page is retrievable as Markdown by
+    appending .md. Published via GitBook.
+compliance_published:
+  certifications: []
+  detail: >-
+    No certification is asserted here. Cerby operates a trust center at
+    https://trust.cerby.com/ but it returned HTTP 403 behind a Cloudflare bot
+    challenge, so no certification list could be read. www.cerby.com/security
+    returns 200 but the named SOC 2 Type I/II and ISO 27001 references on that
+    page describe requirements Cerby places on its own cloud PROVIDERS, not
+    Cerby's own attestations. Recording certifications from that page would
+    misattribute a subprocessor requirement to Cerby.
+  see: security/cerby-trust-center.yml
+x-evidence:
+- url: https://developer.cerby.com/
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://api.cerby.com/openapi.json
+  http_status: 404
+  fetched: '2026-08-09'
+- url: https://help.cerby.com/llms.txt
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://trust.cerby.com/
+  http_status: 403
+  fetched: '2026-08-09'

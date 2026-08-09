@@ -1,0 +1,66 @@
+generated: '2026-08-09'
+method: probed
+source: live probe of /.well-known/ paths
+result: none
+finding: >-
+  Cerby publishes NO /.well-known/ discovery document. Seven hosts were probed
+  against eight well-known paths (56 requests); every one returned 404. No
+  security.txt, no OIDC discovery, no OAuth authorization-server metadata, no
+  API catalog, no agent card. Recorded as an honest zero — this file exists as
+  the probe record and carries NO apis.yml pointer, because there is nothing to
+  point at.
+hosts_probed:
+- www.cerby.com
+- cerby.com
+- api.cerby.com
+- app.cerby.com
+- docs.cerby.com
+- developer.cerby.com
+- help.cerby.com
+paths_probed:
+- path: /.well-known/security.txt
+  spec: RFC 9116
+  status: 404
+- path: /.well-known/openid-configuration
+  spec: OpenID Connect Discovery
+  status: 404
+- path: /.well-known/oauth-authorization-server
+  spec: RFC 8414
+  status: 404
+- path: /.well-known/oauth-protected-resource
+  spec: RFC 9728
+  status: 404
+- path: /.well-known/api-catalog
+  spec: RFC 9727
+  status: 404
+- path: /.well-known/ai-plugin.json
+  status: 404
+- path: /.well-known/agent-card.json
+  spec: A2A 1.0.0
+  status: 404
+- path: /.well-known/agent.json
+  spec: A2A pre-0.3 legacy
+  status: 404
+documents: []
+false_positive_control:
+  note: >-
+    A wildcard catch-all on *.cerby.com answers 200 with a Next.js HTML shell for
+    unknown subdomains. Verified with a control probe:
+    https://zzznotreal.cerby.com/ returned 200. Any 200 from a cerby.com
+    subdomain was therefore checked against this control before being believed —
+    which is how the mcp.cerby.com 200 was correctly rejected as not-an-MCP-server.
+  control_url: https://zzznotreal.cerby.com/
+  control_status: 200
+x-evidence:
+- url: https://www.cerby.com/.well-known/security.txt
+  http_status: 404
+  fetched: '2026-08-09'
+- url: https://api.cerby.com/.well-known/openid-configuration
+  http_status: 404
+  fetched: '2026-08-09'
+- url: https://www.cerby.com/.well-known/agent-card.json
+  http_status: 404
+  fetched: '2026-08-09'
+- url: https://zzznotreal.cerby.com/
+  http_status: 200
+  fetched: '2026-08-09'

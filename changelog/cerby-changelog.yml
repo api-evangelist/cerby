@@ -1,0 +1,93 @@
+generated: '2026-08-09'
+method: searched
+source: https://help.cerby.com/updates-and-releases/cerby-api/2026
+docs:
+  hub: https://help.cerby.com/updates-and-releases
+  api: https://help.cerby.com/updates-and-releases/cerby-api/2026
+  cli: https://help.cerby.com/updates-and-releases/cerby-cli/2026
+  platform: https://help.cerby.com/updates-and-releases/whats-new/2026
+  web_app: https://help.cerby.com/updates-and-releases/cerby-web-app/2026
+  browser_extension: https://help.cerby.com/updates-and-releases/cerby-browser-extension/2026
+  mobile_app: https://help.cerby.com/updates-and-releases/cerby-mobile-app/2026
+scheme:
+  style: dated release notes
+  granularity: per-surface, grouped by year
+  api_versioning: uri-path (v1)
+  current_version: v1
+  archive_years: [2026, 2025, 2024, 2023, 2022, 2021]
+  note: >-
+    Cerby maintains a SEPARATE changelog for the API itself, described as
+    covering "new endpoints and breaking changes" — distinct from the
+    platform-wide What's New feed. That separation is unusual and worth noting:
+    an integrator can watch one page for contract change.
+entries:
+- date: '2026-06-05'
+  surface: api
+  additions:
+  - GET /api/v1/users now accepts filter[status] (live, disabled, pending) and filter[isGuest] (true/false), combinable with each other and the existing free-text filter parameter.
+  breaking: false
+  note: Omitting either filter preserves existing behavior.
+- date: '2026-05-25'
+  surface: api
+  additions:
+  - /v1/search now accepts filter-only requests with an empty query field.
+  - New GET /v1/chaos/application-workflow-type/ lists workflow types registered for an application, optionally filtered by execution platform.
+  behavior_changes:
+  - "last_used: week and last_used: month filter buckets on /v1/search now use cumulative rolling ranges rather than mutually exclusive date bands."
+  breaking: true
+  breaking_detail: >-
+    Cerby explicitly warns external integrators using the last_used filters to
+    verify their expected result sets — a silent semantic change to an existing
+    filter, announced but not versioned.
+- date: '2026-05-25'
+  surface: cli
+  additions:
+  - "`cerby --help`, `cerby -h`, and bare `cerby` now display all commands and global options instead of exiting with an error."
+  fixes:
+  - CLI login success page no longer shows the browser extension's copy or triggers its tab-close behavior.
+  breaking: false
+- date: '2026-05-20'
+  surface: cli
+  additions:
+  - "--workspace flag added to the login command on macOS, skipping the workspace entry step during authentication."
+  breaking: false
+- date: '2026-05-20'
+  surface: api
+  additions:
+  - 'Accounts: list the users in an account; share an account with a user; share an account with a team.'
+  - 'Collections: add an account; add a secret; share with a user; share with a team; update; delete.'
+  - 'Users: user collection schema; user account schema; add a user; list the accounts for a user; list the collections for a user; update a user.'
+  - Users can be invited to a business hub with specific assets in a single API call across TikTok, Google Ads, and Pinterest.
+  breaking: false
+- date: '2026-03-31'
+  surface: api
+  additions:
+  - 'Account schema gained autofillMfa, avatarUrl, createdByEmail, domain, email, meta, passwordSet, passwordVisible, phone, rotatedAt, rotatedBy, rotatedById, status, syncedAt, url.'
+  - 'Collections: subcollection schema; list accounts/secrets/subcollections/users/teams in a collection; remove account/secret/user/team from a collection.'
+  - 'Users: user team schema; user secret schema; list the teams for a user; list the secrets for a user.'
+  - 'Integrations: integration asset schema; unmatched user schema; list assets of an integration; list unmatched users of an integration.'
+  breaking: false
+- date: '2026-02-13'
+  surface: api
+  additions:
+  - 'Account schema gained businessId, cerbyManagedEmail, cerbyManagedPhone, hasBackupCode, hasPasskey, hasTotp, lastLoginBy, lastPasswordChange, mfaEnabled, mfaTypes.'
+  - Account TOTP schema added; retrieve the TOTP code of an account.
+  - 'Users: mfaStatus attribute indicating whether MFA is on for guest and local users, and when.'
+  - 'Teams: team account/secret/collection/member schemas; list accounts, secrets, collections and members of a team; create, update and delete a self-managed team; add members.'
+  - 'Integrations: integration user schema gained dynamicFields for custom properties specific to the integration.'
+  breaking: false
+window:
+  captured: 2026-02-13 through 2026-06-05
+  note: >-
+    Recent window only. The live changelog at the URLs above is the source of
+    truth; earlier years are archived back to 2021.
+x-evidence:
+- url: https://help.cerby.com/updates-and-releases/cerby-api/2026.md
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://help.cerby.com/updates-and-releases/cerby-cli/2026.md
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://help.cerby.com/updates-and-releases/readme.md
+  http_status: 200
+  fetched: '2026-08-09'

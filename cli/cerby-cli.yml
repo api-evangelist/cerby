@@ -1,0 +1,101 @@
+generated: '2026-08-09'
+method: searched
+source: https://help.cerby.com/developer-tools/cerby-cli/explore-the-cerby-cli
+docs:
+- https://help.cerby.com/developer-tools/cerby-cli/explore-the-cerby-cli
+- https://help.cerby.com/developer-tools/cerby-cli/install-the-cerby-cli
+- https://help.cerby.com/developer-tools/cerby-cli/authenticate-with-the-cerby-cli
+- https://help.cerby.com/developer-tools/cerby-cli/set-up-the-cerby-cli-as-a-trusted-device
+- https://help.cerby.com/developer-tools/cerby-cli/use-the-cerby-cli
+- https://help.cerby.com/developer-tools/cerby-cli/interpret-and-customize-the-cerby-cli-output-data
+name: Cerby CLI
+official: true
+purpose: >-
+  Retrieve Cerby-managed accounts and secrets from the command line so local
+  scripts and bots can consume credentials without a browser session.
+
+distribution:
+  channel: in-product download only
+  location: Cerby web app > user profile menu > My Profile > Dev Tools > Download the Cerby CLI
+  registries: none
+  registry_note: >-
+    The CLI is NOT published to npm, PyPI, Homebrew, or any other public package
+    registry. Binaries are downloadable only from an authenticated Cerby
+    workspace, and Cerby explicitly instructs users to trust only executables
+    obtained that way.
+  binaries:
+  - os: windows
+    artifact: Cerby CLI Installer.msi
+    binary: cerby-win.exe
+    install_path: C:\Program Files (x86)\Cerby\Cli\
+  - os: macos
+    artifact: cerby-macos
+    note: Apple Silicon only. Intel-based processors are not supported.
+  - os: linux
+    artifact: cerby-linux
+    install: chmod +x cerby-linux
+
+authentication:
+  mechanism: bearer token retrieved from the Cerby web app
+  trusted_device_required_for: sync and local decryption of vault material
+  local_credential_storage:
+    macos: Keychain
+    windows: Credentials Manager
+  see: authentication/cerby-authentication.yml
+
+invocation:
+  form: cerby-{os} <group> <command> [flags]
+  os_suffixes: [win, macos, linux]
+
+commands:
+- group: secrets
+  commands:
+  - command: secrets list
+    description: List the secrets in your Cerby workspace. Returns the first 20 by default.
+    flags: ['--page-size', '--start-index']
+    response_keys: [itemsPerPage, secureSecrets, startIndex, totalResults]
+  - command: secrets get
+    description: Retrieve the value of a particular secret.
+    flags: ['--id']
+- group: accounts
+  commands:
+  - command: accounts list
+    description: List the accounts you created or that were shared with you. Returns the first 20 by default.
+    flags: ['--page-size', '--start-index']
+    response_keys: [startIndex, limit, totalResults, accounts]
+  - command: accounts get
+    description: Retrieve the information of an account by ID, optionally including the password.
+    flags: ['--id']
+- group: sync
+  commands:
+  - command: sync
+    description: >-
+      Retrieve and store vault material locally so local bots can read account
+      passwords and secret values. Requires a trusted device. Returns no output.
+- group: meta
+  commands:
+  - command: --version
+    description: Print the Cerby CLI version.
+
+pagination:
+  style: index-based
+  flags: ['--page-size', '--start-index']
+  note: >-
+    The CLI uses --page-size/--start-index and returns startIndex/totalResults,
+    which is a different pagination vocabulary than the REST API's
+    page[number]/page[size] and meta.page.total.
+
+output:
+  format: JSON
+  customizable: true
+  docs: https://help.cerby.com/developer-tools/cerby-cli/interpret-and-customize-the-cerby-cli-output-data
+
+changelog: https://help.cerby.com/updates-and-releases/cerby-cli/2026
+
+x-evidence:
+- url: https://help.cerby.com/developer-tools/cerby-cli/use-the-cerby-cli.md
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://help.cerby.com/developer-tools/cerby-cli/install-the-cerby-cli.md
+  http_status: 200
+  fetched: '2026-08-09'

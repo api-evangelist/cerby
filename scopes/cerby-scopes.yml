@@ -1,0 +1,89 @@
+generated: '2026-08-09'
+method: searched
+source: https://developer.cerby.com/#authentication
+docs: https://help.cerby.com/developer-tools/cerby-api/generate-an-api-key
+scheme_type: apiKey
+note: >-
+  These are Cerby API KEY scopes, not OAuth 2.0 scopes. Cerby publishes no
+  oauth2 security scheme and no authorization/token endpoint for its public API
+  — authorization is a scope set attached to an X-API-Key at generation time,
+  selected in the Cerby web app, and updatable afterwards. Scopes are recorded
+  here because they are the provider's real, published authorization vocabulary.
+  Display names are quoted verbatim from the developer portal; a machine
+  identifier is recorded ONLY where Cerby published one.
+schemes:
+- name: CerbyApiKey
+  type: apiKey
+  in: header
+  parameter_name: X-API-Key
+  source: https://developer.cerby.com/#authentication
+enforcement:
+  missing_or_wrong_scope: 401
+  insufficient_permission: 403
+  note: >-
+    Scopes are necessary but not sufficient. RBAC is enforced on top: a key only
+    reaches items whose Owner role its creating user holds. All-Access Mode is
+    not honored by the API.
+scopes:
+- scope: Read activities
+  description: Enables reading activity data.
+  access: read
+- scope: Read items
+  description: Enables reading account, secret, and collection data.
+  access: read
+- scope: Read accounts
+  description: Enables reading account data.
+  access: read
+- scope: Read secrets
+  description: Enables reading secret data.
+  access: read
+- scope: Read users
+  description: Enables reading user and team data.
+  access: read
+- scope: Read integrations
+  description: Enables reading integration and entitlement data.
+  access: read
+- scope: Read automated jobs
+  identifier: read:automations
+  description: Enables reading automated job data.
+  access: read
+  identifier_source: https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver
+- scope: Read vaults
+  description: Enables reading vault data.
+  access: read
+- scope: Read teams
+  description: Enables reading team data.
+  access: read
+- scope: Write accounts
+  description: Enables writing account data.
+  access: write
+- scope: Write secrets
+  description: Enables writing secret data.
+  access: write
+- scope: Write users
+  description: Enables writing user data.
+  access: write
+- scope: Write integrations
+  description: Enables writing integration and entitlement data.
+  access: write
+- scope: Write automated jobs
+  description: Enables writing automated job data.
+  access: write
+- scope: Write collections
+  description: Enables writing collection and subcollection data.
+  access: write
+- scope: Write teams
+  description: Enables writing team data.
+  access: write
+- scope: Delete teams
+  description: Enables deleting team data.
+  access: delete
+summary:
+  total: 17
+  read: 9
+  write: 7
+  delete: 1
+x-evidence:
+- url: https://developer.cerby.com/
+  http_status: 200
+  fetched: '2026-08-09'

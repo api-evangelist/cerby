@@ -42,5 +42,37 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Cerby is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://www.nasdaqprivatemarket.com/
+Cerby is an identity, access, and password management platform for nonfederated and disconnected
+applications — the enterprise software that does not support SAML, SCIM, or an integration API of its
+own. Cerby extends existing IAM, IGA, and PAM systems to those applications through browser and
+robotic automation, adding provisioning and deprovisioning, credential rotation, MFA enrollment, and
+access governance where no standards-based integration exists.
+
+## Public API surface
+
+| Surface | Where |
+|---|---|
+| Cerby API (REST) | https://developer.cerby.com/ |
+| Cerby Webhooks | https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver |
+| Cerby SCIM 2.0 | https://api.cerby.com/v1/scim/v2 |
+| Cerby CLI | https://help.cerby.com/developer-tools/cerby-cli/explore-the-cerby-cli |
+| Developer tools hub | https://help.cerby.com/developer-tools/readme |
+| Status | https://status.cerby.com/ |
+| Trust center | https://trust.cerby.com/ |
+| GitHub | https://github.com/cerbyinc |
+
+The Cerby API is a JSON:API-style REST API over eight resources — accounts, secrets, collections,
+users, teams, integrations, jobs, and vaults — authenticated with a scoped `X-API-Key` and served
+per-workspace at `https://{my-workspace}.cerby.com/api/v1/`.
+
+## Notes from this profile
+
+- **No OpenAPI is published.** The developer portal states the API "follows RESTful principles and
+  the OpenAPI 3.0 Specifications", but the reference is a static Slate page and no spec is
+  downloadable from any host probed.
+- **No AsyncAPI is published**, though the webhook contract is documented in unusual depth — signed
+  deliveries, 21 event types, a published retry policy, and CI-tested reference verifiers.
+- **No `/.well-known/` document exists** on any Cerby host, including no `security.txt`.
+- The SOC 2 / ISO 27001 names on cerby.com/security belong to Cerby's **cloud provider**, not to
+  Cerby. See `security/cerby-trust-center.yml`.
+- `github.com/cerby` is an unrelated personal account. The company org is `github.com/cerbyinc`.

@@ -1,0 +1,225 @@
+generated: '2026-08-09'
+method: derived
+source: https://developer.cerby.com/#api-reference
+derivation: >-
+  Derived from the published Cerby API reference — the eight documented
+  collections, their published schemas, and the sub-resource paths that bind
+  them. Cerby publishes no OpenAPI, so relationships are read from the documented
+  endpoint paths (for example GET /collections/{id}/accounts) and the named
+  schemas, not from $ref graphs. Nothing is inferred beyond a documented route.
+identifiers:
+  format: UUID
+  prefixes: none
+  note: Cerby uses bare UUIDs with no type prefixes, so an ID is not self-describing.
+entities:
+- name: account
+  description: A credential-bearing account in a third-party application that Cerby manages.
+  schemas:
+  - The account schema
+  - The account secret schema
+  - The account TOTP code schema
+  collection_path: /api/v1/accounts
+  operations: [list, retrieve, update, get-password, get-totp-code, list-users, share-with-user, share-with-team, remove-user, remove-team]
+  documented_attributes:
+  - id
+  - domain
+  - status
+  - url
+  - email
+  - phone
+  - meta
+  - businessId
+  - avatarUrl
+  - createdByEmail
+  - autofillMfa
+  - passwordSet
+  - passwordVisible
+  - cerbyManagedEmail
+  - cerbyManagedPhone
+  - hasBackupCode
+  - hasPasskey
+  - hasTotp
+  - mfaEnabled
+  - mfaTypes
+  - lastLoginBy
+  - lastPasswordChange
+  - rotatedAt
+  - rotatedBy
+  - rotatedById
+  - syncedAt
+- name: secret
+  description: A stored secret (text, server, ssh_key, database, wifi_password, software_license, or custom).
+  schemas: [The secret schema]
+  collection_path: /api/v1/secrets
+  operations: [list, retrieve, list-members, create, share, remove-user, remove-team, delete]
+  categories: [text, server, ssh_key, database, wifi_password, software_license, custom]
+- name: collection
+  description: A container grouping accounts, secrets, and nested subcollections.
+  schemas: [The collection schema, The subcollection schema]
+  collection_path: /api/v1/collections
+  operations: [list, retrieve, list-accounts, list-secrets, list-subcollections, list-users, list-teams, create, update, add-account, add-secret, share-with-user, share-with-team, remove-account, remove-secret, remove-user, remove-team, delete]
+  self_referential: true
+- name: user
+  description: A member of the Cerby workspace.
+  schemas: [The user schema, The user team schema, The user secret schema, The user collection schema, The user account schema]
+  collection_path: /api/v1/users
+  operations: [list, retrieve, add, list-accounts, list-secrets, list-collections, list-teams, update, delete]
+  documented_attributes: [id, mfaStatus, isGuest, status]
+- name: team
+  description: A group of users; may be IdP-managed or self-managed.
+  schemas: [The team schema, The team account schema, The team secret schema, The team collection schema, The team member schema]
+  collection_path: /api/v1/teams
+  operations: [list, retrieve, list-accounts, list-secrets, list-collections, list-members, create-self-managed, update, delete-self-managed, add-member, remove-member, remove-account, remove-secret, remove-collection]
+  variants: [idp-managed, self-managed]
+  note: Only self-managed teams can be created and deleted through the API.
+- name: integration
+  description: A connected third-party application, its assets, entitlements, and the users mapped into it.
+  schemas: [The integration schema, The entitlement schema, The integration user schema, The integration job schema, The integration asset schema, The unmatched user schema]
+  collection_path: /api/v1/integrations
+  operations: [list, retrieve, list-entitlements, list-assets, list-asset-users, retrieve-asset-user, grant-asset-access, update-asset-entitlements, remove-asset-user, list-asset-unmatched-users, remove-asset-unmatched-user, update-user-entitlements, add-remove-user-entitlements, retrieve-user, list-users, list-unmatched-users, remove-unmatched-user, invite-user, remove-user]
+  filters:
+  - filter[application]
+- name: job
+  description: An automation job record. Read-only through the API.
+  schemas: [The job schema]
+  collection_path: /api/v1/jobs
+  operations: [retrieve]
+  note: >-
+    No list operation is published — a job is reachable only by ID, which is how
+    a webhook automation_link resolves.
+- name: vault
+  description: An encrypted store that holds accounts and secrets.
+  schemas: [The vault schema]
+  collection_path: /api/v1/vaults
+  operations: [list]
+  note: List only. No create, retrieve-by-id, update, or delete is published.
+relationships:
+- from: collection
+  to: account
+  cardinality: has_many
+  via: GET/POST/DELETE /collections/{id}/accounts
+- from: collection
+  to: secret
+  cardinality: has_many
+  via: GET/POST/DELETE /collections/{id}/secrets
+- from: collection
+  to: collection
+  cardinality: has_many
+  via: GET /collections/{id}/collections
+  note: Subcollections — the model is a tree.
+- from: collection
+  to: user
+  cardinality: has_many
+  via: GET/POST/DELETE /collections/{id}/users
+  semantics: access grant
+- from: collection
+  to: team
+  cardinality: has_many
+  via: GET/POST/DELETE /collections/{id}/teams
+  semantics: access grant
+- from: account
+  to: user
+  cardinality: has_many
+  via: GET/POST/DELETE /accounts/{id}/users
+  semantics: access grant with a role
+- from: account
+  to: team
+  cardinality: has_many
+  via: POST/DELETE /accounts/{id}/teams
+  semantics: access grant with a role
+- from: account
+  to: secret
+  cardinality: has_many
+  via: GET /accounts/{id}/secrets?filter[secretType]=password
+- from: account
+  to: vault
+  cardinality: belongs_to
+  via: vaultId
+- from: secret
+  to: vault
+  cardinality: belongs_to
+  via: vaultId
+- from: secret
+  to: user
+  cardinality: has_many
+  via: GET/POST/DELETE /secrets/{id}/members/users
+- from: secret
+  to: team
+  cardinality: has_many
+  via: DELETE /secrets/{id}/members/teams/{teamId}
+- from: user
+  to: account
+  cardinality: has_many
+  via: GET /users/{id}/accounts
+- from: user
+  to: secret
+  cardinality: has_many
+  via: GET /users/{id}/secrets
+- from: user
+  to: collection
+  cardinality: has_many
+  via: GET /users/{id}/collections
+- from: user
+  to: team
+  cardinality: has_many
+  via: GET /users/{id}/teams
+- from: team
+  to: user
+  cardinality: has_many
+  via: GET/POST/DELETE /teams/{id}/members
+- from: team
+  to: account
+  cardinality: has_many
+  via: GET/DELETE /teams/{id}/accounts
+- from: team
+  to: secret
+  cardinality: has_many
+  via: GET/DELETE /teams/{id}/secrets
+- from: team
+  to: collection
+  cardinality: has_many
+  via: GET/DELETE /teams/{id}/collections
+- from: integration
+  to: entitlement
+  cardinality: has_many
+  via: GET /integrations/{id}/entitlements
+- from: integration
+  to: asset
+  cardinality: has_many
+  via: GET /integrations/{id}/assets
+- from: integration
+  to: user
+  cardinality: has_many
+  via: GET/POST/PATCH/DELETE /integrations/{id}/users
+- from: integration
+  to: unmatched_user
+  cardinality: has_many
+  via: GET/DELETE /integrations/{id}/unmatched-users
+  semantics: >-
+    A user found in the third-party application that Cerby has not matched to a
+    workspace user — the reconciliation backlog of the model.
+- from: asset
+  to: user
+  cardinality: has_many
+  via: GET/POST/PATCH/DELETE /integrations/{id}/assets/{assetId}/users
+- from: job
+  to: account
+  cardinality: belongs_to
+  via: account_id (webhook data payload)
+- from: job
+  to: integration
+  cardinality: belongs_to
+  via: application (webhook data payload)
+summary:
+  entities: 8
+  relationships: 25
+  root_of_containment: vault
+  access_model: >-
+    Access is a first-class edge, not a field. Accounts, secrets, and
+    collections are each shared to users and to teams through their own
+    sub-resources with an explicit role — which is why the same has_many shape
+    repeats across three entities.
+x-evidence:
+- url: https://developer.cerby.com/
+  http_status: 200
+  fetched: '2026-08-09'

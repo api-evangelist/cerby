@@ -1,0 +1,96 @@
+generated: '2026-08-09'
+method: searched
+source: https://developer.cerby.com/#authentication
+docs: https://help.cerby.com/developer-tools/cerby-api/explore-api-keys-and-bearer-tokens
+note: >-
+  Cerby publishes no OpenAPI document, so this profile is read from the published
+  developer portal and help-center articles rather than derived from
+  securitySchemes. Nothing here is inferred.
+summary:
+  types:
+  - apiKey
+  - http
+  api_key_in:
+  - header
+  oauth2_flows: []
+  oauth2: false
+  openid_connect: false
+  mutual_tls: false
+schemes:
+- name: CerbyApiKey
+  type: apiKey
+  in: header
+  parameter_name: X-API-Key
+  applies_to: Cerby API (https://{my-workspace}.cerby.com/api/v1/)
+  description: >-
+    Every request to the Cerby API must carry the X-API-Key header. Keys are
+    generated and retrieved only from the Cerby web app after authenticating
+    through the corporate identity provider (Okta, Entra ID, OneLogin) that
+    fronts the workspace. Keys are scoped — see scopes/cerby-scopes.yml — and
+    the scopes selected at generation time determine which endpoints and data
+    the key can reach.
+  authorization_model: >-
+    Cerby layers role-based access control on top of the key. A key resolves to
+    the user who created it, so it can only reach items that user holds the
+    required workspace and item role on. All-Access Mode, which lets workspace
+    Owners and Super Admins see every item in the web app, is explicitly NOT
+    honored by the API — API requests return only items the key's user has the
+    Owner role on, regardless of the All-Access Mode setting.
+  failure_modes:
+  - condition: expired key, or key lacking the scopes for the endpoint
+    status: 401
+  - condition: key valid but without permission for the requested operation
+    status: 403
+  docs: https://help.cerby.com/developer-tools/cerby-api/generate-an-api-key
+  source: https://developer.cerby.com/#authentication
+- name: CerbyBearerToken
+  type: http
+  scheme: bearer
+  applies_to: Cerby CLI
+  description: >-
+    The Cerby CLI authenticates with a bearer token retrieved from the Cerby web
+    app rather than with an X-API-Key. The CLI additionally requires the machine
+    to be registered as a trusted device before it can sync and decrypt vault
+    material locally.
+  docs: https://help.cerby.com/developer-tools/cerby-api/retrieve-a-bearer-token
+  source: https://help.cerby.com/developer-tools/cerby-api/explore-api-keys-and-bearer-tokens
+- name: CerbyScimToken
+  type: apiKey
+  in: header
+  parameter_name: Authorization
+  applies_to: Cerby SCIM 2.0 (https://api.cerby.com/v1/scim/v2)
+  description: >-
+    SCIM provisioning from an identity provider uses a separate SCIM API
+    authentication token, generated and regenerable from the Cerby web app. It
+    is distinct from the Cerby API key and does not carry API-key scopes.
+  docs: https://help.cerby.com/setup-and-admin/workspace-identity-federation/retrieve-the-scim-api-authentication-token-from-cerby
+  source: https://help.cerby.com/llms.txt
+key_management:
+  generated_in: Cerby web app (My Profile > Dev Tools)
+  scopes_selectable_at_creation: true
+  scopes_updatable: true
+  viewable: true
+  revocable: true
+  expiring: true
+  docs:
+  - https://help.cerby.com/developer-tools/cerby-api/generate-an-api-key
+  - https://help.cerby.com/developer-tools/cerby-api/update-the-scopes-of-an-api-key
+  - https://help.cerby.com/developer-tools/cerby-api/view-the-details-of-an-api-key
+  - https://help.cerby.com/developer-tools/cerby-api/delete-an-api-key
+guidance_published:
+- Do not share API keys in public repositories or client-side code.
+- Keys grant access to workspace data and are treated as sensitive resources.
+webhook_authentication:
+  direction: inbound-to-customer
+  mechanism: request signing, not an API key
+  see: asyncapi/cerby-webhooks.yml
+x-evidence:
+- url: https://developer.cerby.com/
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://help.cerby.com/developer-tools/cerby-api/explore-api-keys-and-bearer-tokens.md
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://help.cerby.com/developer-tools/cerby-api/generate-an-api-key.md
+  http_status: 200
+  fetched: '2026-08-09'

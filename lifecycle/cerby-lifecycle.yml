@@ -1,0 +1,74 @@
+generated: '2026-08-09'
+method: searched
+source: https://developer.cerby.com/
+versioning:
+  scheme: uri-path
+  current: v1
+  location: https://{my-workspace}.cerby.com/api/v1/
+  docs: https://developer.cerby.com/#url-structure
+  event_envelope:
+    scheme: envelope field
+    field: envelope_version
+    current: '1.0'
+    note: >-
+      Cerby states new fields may be added to the webhook envelope WITHOUT a
+      version bump, and publishes forward-compatibility rules receivers must
+      apply instead.
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: not documented
+  deprecation_header: not documented
+  detail: >-
+    Cerby publishes no formal deprecation or sunset policy, and no RFC 8594
+    Sunset/Deprecation header support is documented. Change is communicated
+    through the dated API release notes only. The 2026-05-25 entry changed the
+    semantics of the existing /v1/search last_used filter buckets in place, with
+    a note telling external integrators to verify their result sets — announced,
+    but not versioned and not deprecation-managed.
+  nearest_equivalent:
+    mechanism: reserved and provisional event types
+    detail: >-
+      On the webhook surface Cerby publishes a forward-looking equivalent: four
+      RESERVED event types that return HTTP 400 on subscription until released,
+      and five PROVISIONAL event types defined in the catalog without a
+      confirmed emitter. It manages the not-yet-shipped edge explicitly while
+      leaving the being-removed edge unaddressed.
+  reserved_event_types:
+  - account.vault.assigned
+  - account.trusted_session.established
+  - automation.users.attributes_updated
+  - automation.users.synced
+status_page: https://status.cerby.com/
+status_page_detail:
+  verified: true
+  http_status: 200
+  title: Cerby Status
+  subscriptions: [email, sms]
+  machine_readable_feed: not found
+sla:
+  url: null
+  uptime_target: not published
+support:
+  help_center: https://help.cerby.com/
+  troubleshooting: https://help.cerby.com/tips-and-troubleshooting
+changelog: changelog/cerby-changelog.yml
+known_limitations_published:
+- Webhooks are not available for Canada-resident workspaces (ca-central-1) in this release.
+- account.deleted is subscribable but not delivered in this release.
+- Cerby CLI on macOS supports Apple Silicon only; Intel processors are not supported.
+- All-Access Mode is not honored by the API.
+deprecated_operations: []
+deprecated_operations_note: >-
+  Cannot be derived — Cerby publishes no OpenAPI document, so there is no
+  machine-readable `deprecated: true` flag to read.
+x-evidence:
+- url: https://status.cerby.com/
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://developer.cerby.com/
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://help.cerby.com/updates-and-releases/cerby-api/2026.md
+  http_status: 200
+  fetched: '2026-08-09'

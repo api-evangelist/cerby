@@ -1,0 +1,142 @@
+generated: '2026-08-09'
+method: searched
+source: https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver
+scope: >-
+  Automation failure codes carried on the `automation.failed` webhook event.
+  These are the non-payments sibling of a decline-code registry: Cerby drives
+  provisioning and credential rotation by automating third-party applications,
+  and this is the published vocabulary for why an automation did not complete.
+  Distinct from errors/cerby-problem-types.yml, which covers API-level errors.
+delivery:
+  event_type: automation.failed
+  note: >-
+    All automation failures share one event type. The specific failure is
+    identified by error.code, not by the event type. Individual error codes are
+    not separately subscribable.
+envelope:
+  field: error
+  fields:
+    code:
+      type: string
+      description: Stable machine identifier. Treat unrecognized values as opaque generic failures.
+    message:
+      type: string or null
+      description: Human-readable description. May be null. Do not rely on its exact wording.
+    user_action:
+      type: string or null
+      description: >-
+        Coarse remediation category. Null or unknown values should be treated as
+        "review in Cerby".
+  remediation_field:
+    field: data.remediation
+    note: >-
+      Only NotEnoughSeats populates data.remediation with machine-readable
+      detail in this release. All other codes deliver data.remediation as null.
+tiers:
+  '0': >-
+    Failures that must be remediated outside Cerby, in the target application,
+    before the automation is retried.
+  '1': Credential and vault problems with the stored account.
+  '2': Contact-information and MFA configuration problems.
+  '3': Trusted-session / device problems.
+codes:
+- code: NotEnoughSeats
+  tier: 0
+  user_action: add_licenses
+  remediation_payload: {seats_required: null, seats_available: null, license_type: null}
+  remediation_populated: true
+- code: SubscriptionDeactivated
+  tier: 0
+  user_action: reactivate_subscription
+  remediation_populated: false
+- code: UnderpermissionedAccount
+  tier: 0
+  user_action: grant_permissions
+  remediation_populated: false
+- code: InvalidBusinessId
+  tier: 0
+  user_action: fix_business_id
+  remediation_populated: false
+- code: BadCredentials
+  tier: 1
+  user_action: review_credentials
+  message_example: The username or password stored in Cerby is incorrect
+  remediation_populated: false
+- code: EmptyPasswordError
+  tier: 1
+  user_action: review_credentials
+  remediation_populated: false
+- code: AccountVaultError
+  tier: 1
+  user_action: contact_support
+  remediation_populated: false
+- code: EmailNotProvidedError
+  tier: 2
+  user_action: update_contact_info
+  remediation_populated: false
+- code: InvalidEmail
+  tier: 2
+  user_action: update_contact_info
+  remediation_populated: false
+- code: PhoneNotProvidedError
+  tier: 2
+  user_action: update_contact_info
+  remediation_populated: false
+- code: PhoneNotManagedError
+  tier: 2
+  user_action: configure_mfa
+  remediation_populated: false
+- code: GeneralMFANotManagedError
+  tier: 2
+  user_action: configure_mfa
+  remediation_populated: false
+- code: MFANotManagedError
+  tier: 2
+  user_action: configure_mfa
+  remediation_populated: false
+- code: MFAAlreadyEnable
+  tier: 2
+  user_action: configure_mfa
+  remediation_populated: false
+  note: >-
+    MFAAlreadyEnable is the exact wire value. The missing "d" is intentional and
+    Cerby documents that it must not be corrected in code.
+- code: OtherMFAMethodEnabledError
+  tier: 2
+  user_action: configure_mfa
+  remediation_populated: false
+- code: VerificationMethodsNotManagedError
+  tier: 2
+  user_action: configure_mfa
+  remediation_populated: false
+- code: SecureDeviceNotFoundInStorage
+  tier: 3
+  user_action: reauthenticate
+  remediation_populated: false
+user_actions:
+- action: review_credentials
+  meaning: Update the username or password stored in Cerby.
+- action: update_contact_info
+  meaning: Add or correct an email or phone number in Cerby.
+- action: configure_mfa
+  meaning: Set up or transfer MFA management to Cerby.
+- action: reauthenticate
+  meaning: Re-establish the Cerby browser extension trusted session.
+- action: contact_support
+  meaning: Contact Cerby Support to resolve the issue.
+- action: add_licenses
+  meaning: Purchase additional seats in the target application.
+- action: reactivate_subscription
+  meaning: Reactivate the target application subscription.
+- action: grant_permissions
+  meaning: Grant the Cerby-managed account the required permissions.
+- action: fix_business_id
+  meaning: Correct the business or tenant ID configured in Cerby.
+summary:
+  codes: 17
+  user_actions: 9
+  tiers: 4
+x-evidence:
+- url: https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver.md
+  http_status: 200
+  fetched: '2026-08-09'

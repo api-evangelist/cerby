@@ -1,23 +1,158 @@
 aid: cerby
 name: Cerby
-description: 'Cerby is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: Cerby is an identity, access, and password management platform for nonfederated and disconnected
+  applications — the enterprise software that does not support SAML, SCIM, or an integration API of its
+  own. Cerby extends existing IAM, IGA, and PAM systems to those applications through browser and robotic
+  automation, adding provisioning and deprovisioning, credential rotation, MFA enrollment, and access
+  governance where no standards-based integration exists. Cerby publishes a public RESTful API (JSON:API-style
+  envelope, X-API-Key authentication, scoped API keys) over eight resources — accounts, secrets, collections,
+  users, teams, integrations, jobs, and vaults — plus a signed webhook notification service, a cross-platform
+  CLI, and SCIM 2.0 endpoints for provisioning from Okta, Entra ID, and OneLogin.
 url: https://raw.githubusercontent.com/api-evangelist/cerby/refs/heads/main/apis.yml
+image: https://www.cerby.com/hubfs/Logos/Cerby%20Favicon%20-%20Alternate.png
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-08-09'
 modified: '2026-08-09'
 tags:
-- Company
-apis: []
+- Identity
+- Access Management
+- Security
+- Password Management
+- Provisioning
+- SCIM
+- Identity Governance
+- Nonfederated Applications
+- Automation
+- Webhooks
+apis:
+- aid: cerby:cerby-api
+  name: Cerby API
+  description: The public Cerby REST API. Programmatic access to accounts, secrets, collections, users,
+    teams, integrations, jobs, and vaults in a Cerby workspace. Requests are authenticated with a scoped
+    API key sent in the X-API-Key header; responses use a JSON:API-style envelope of data, links, and
+    meta objects with page[number]/page[size] pagination, filter[...] filtering, and sort ordering.
+  humanURL: https://developer.cerby.com/
+  baseURL: https://my-workspace.cerby.com/api/v1/
+  tags:
+  - Identity
+  - Access Management
+  - Secrets
+  - Provisioning
+  properties:
+  - type: Documentation
+    url: https://developer.cerby.com/
+  - type: APIReference
+    url: https://developer.cerby.com/#api-reference
+  - type: Authentication
+    url: authentication/cerby-authentication.yml
+  - type: OAuthScopes
+    url: scopes/cerby-scopes.yml
+  - type: Conventions
+    url: conventions/cerby-conventions.yml
+  - type: Idempotency
+    url: conventions/cerby-conventions.yml
+  - type: ErrorCatalog
+    url: errors/cerby-problem-types.yml
+  - type: DataModel
+    url: data-model/cerby-data-model.yml
+- aid: cerby:cerby-webhooks
+  name: Cerby Webhooks
+  description: Cerby's webhook notification service delivers real-time signed HTTPS events for account,
+    credential, MFA, and automation lifecycle changes. Deliveries carry a fixed JSON envelope (envelope_version,
+    event_id, event_type, occurred_at, workspace_id, data), an Ed25519 or HMAC-SHA256 signature over timestamp.body,
+    an Idempotency-Key header, at-least-once semantics with documented dedup keys, and a six-attempt exponential
+    retry policy with a 24-hour hard deadline.
+  humanURL: https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver
+  baseURL: https://my-workspace.cerby.com/api/v1/
+  tags:
+  - Webhooks
+  - Events
+  - Identity
+  properties:
+  - type: Webhooks
+    url: asyncapi/cerby-webhooks.yml
+  - type: Documentation
+    url: https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver
+  - type: ErrorCatalog
+    url: errors/cerby-automation-failure-codes.yml
+- aid: cerby:cerby-scim
+  name: Cerby SCIM 2.0
+  description: Cerby exposes SCIM 2.0 endpoints so an identity provider can automatically provision and
+    deprovision users and groups into a Cerby workspace. Documented for Okta, Microsoft Entra ID, and
+    OneLogin, authenticated with a SCIM API token generated and rotated from the Cerby web app.
+  humanURL: https://help.cerby.com/setup-and-admin/workspace-identity-federation/retrieve-the-scim-api-authentication-token-from-cerby
+  baseURL: https://api.cerby.com/v1/scim/v2
+  tags:
+  - SCIM
+  - Provisioning
+  - Identity
+  properties:
+  - type: Documentation
+    url: https://help.cerby.com/setup-and-admin/workspace-identity-federation/retrieve-the-scim-api-authentication-token-from-cerby
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: DomainSecurity
+  url: security/cerby-domain-security.yml
 - type: Website
-  url: https://www.nasdaqprivatemarket.com/
+  url: https://www.cerby.com/
+- type: DeveloperPortal
+  url: https://developer.cerby.com/
+- type: Documentation
+  url: https://help.cerby.com/developer-tools/readme
+- type: APIReference
+  url: https://developer.cerby.com/#api-reference
+- type: GettingStarted
+  url: https://help.cerby.com/getting-started
+- type: Support
+  url: https://help.cerby.com/
+- type: Blog
+  url: https://www.cerby.com/resources/blog
+- type: SignUp
+  url: https://app.cerby.com/
+- type: Pricing
+  url: https://www.cerby.com/contact-us
+- type: StatusPage
+  url: https://status.cerby.com/
+- type: ChangeLog
+  url: changelog/cerby-changelog.yml
+- type: CLI
+  url: cli/cerby-cli.yml
+- type: LLMsTxt
+  url: llms/cerby-llms.txt
+- type: Lifecycle
+  url: lifecycle/cerby-lifecycle.yml
+- type: Conformance
+  url: conformance/cerby-conformance.yml
+- type: Packages
+  url: packages/cerby-packages.yml
+- type: TrustCenter
+  url: security/cerby-trust-center.yml
+- type: VulnerabilityDisclosure
+  url: security/cerby-vulnerability-disclosure.yml
+- type: Authentication
+  url: authentication/cerby-authentication.yml
+- type: OAuthScopes
+  url: scopes/cerby-scopes.yml
+- type: Conventions
+  url: conventions/cerby-conventions.yml
+- type: Idempotency
+  url: conventions/cerby-conventions.yml
+- type: ErrorCatalog
+  url: errors/cerby-problem-types.yml
+- type: Webhooks
+  url: asyncapi/cerby-webhooks.yml
+- type: DataModel
+  url: data-model/cerby-data-model.yml
+- type: GitHubOrganization
+  url: https://github.com/cerbyinc
+x-enrichment:
+  date: '2026-08-09'
+  status: enriched
+  artifacts_added: 17
+  pass: local-v1

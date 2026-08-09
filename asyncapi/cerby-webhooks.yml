@@ -1,0 +1,214 @@
+generated: '2026-08-09'
+method: searched
+source: https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver
+spec_type: none
+spec_note: >-
+  Cerby publishes NO AsyncAPI document. Probed https://api.cerby.com/asyncapi.yaml
+  (404), https://help.cerby.com/asyncapi.yaml (404) and
+  https://developer.cerby.com/asyncapi.json (404). What Cerby does publish is a
+  complete prose webhook contract — envelope, headers, signature algorithm,
+  event catalog, retry policy — captured here as a webhook catalog. This file is
+  a faithful record of that documentation, not a generated spec.
+surface: webhooks
+docs:
+- https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver
+- https://help.cerby.com/setup-and-admin/workspace-settings/webhooks/explore-webhook-notifications
+- https://help.cerby.com/setup-and-admin/workspace-settings/webhooks/create-a-webhook
+- https://help.cerby.com/setup-and-admin/workspace-settings/webhooks/rotate-a-webhook-signing-key
+- https://help.cerby.com/setup-and-admin/workspace-settings/webhooks/test-a-webhook-endpoint
+
+envelope:
+  version_field: envelope_version
+  version: '1.0'
+  content_type: application/json
+  fields:
+    envelope_version: {type: string, note: Always "1.0" in this release. New fields may be added without a version bump.}
+    event_id: {type: string (UUIDv7), note: Unique per event. Stable across all retry attempts. Use as the per-event idempotency key.}
+    event_type: {type: string}
+    occurred_at: {type: string (RFC 3339, UTC, ms), note: When Cerby recorded the event, not the source-system time.}
+    workspace_id: {type: string (UUID)}
+    data: {type: object, note: Event-specific payload. Fields vary by event type.}
+    error: {type: object, note: 'Present ONLY on failure events — absent, not null, otherwise. Fields: code, message, user_action.'}
+    trace_id: {type: 'null', note: Reserved. Always null in this release.}
+    correlation_id: {type: 'null', note: Reserved. Always null in this release.}
+
+headers:
+- name: X-Cerby-Signature
+  description: '<algo>=<base64url(sig)> where <algo> is ed25519 or hmac-sha256. Repeated during a key rotation (new key first, old key second).'
+- name: X-Cerby-Signature-Key-Id
+  description: UUID of the signing key used. One header per signature row, in the same order as X-Cerby-Signature.
+- name: X-Cerby-Signature-Timestamp
+  description: RFC 3339 millisecond-precision UTC timestamp, part of the signed message. Reject if more than five minutes from now.
+- name: X-Cerby-Delivery
+  description: UUID constant across all retry attempts for the same event and webhook. Per-delivery idempotency key.
+- name: X-Cerby-Attempt
+  description: Attempt number starting at 1, incremented on each retry, up to 6.
+- name: Idempotency-Key
+  description: Same value as X-Cerby-Delivery, provided as a convenience alias.
+
+security:
+  mechanism: request signing
+  algorithms: [ed25519, hmac-sha256]
+  signed_bytes: '<timestamp_ms>.<raw_body_bytes>'
+  canonicalization: none
+  clock_skew_tolerance_ms: 300000
+  base64: base64url, unpadded (re-pad before decoding)
+  reference_implementations: [python, nodejs]
+  reference_implementations_note: Kept in sync with Cerby's CI test suite.
+  key_retrieval_endpoint: GET /v1/event-webhooks/{webhook_id}/keys
+  key_rotation:
+    dual_sign_window_hours: 24
+    ordering: new key first (primary), old key second (secondary)
+    cache_miss_signal: >-
+      An unrecognized X-Cerby-Signature-Key-Id means a rotation has started —
+      re-fetch both keys before rejecting.
+
+delivery:
+  guarantee: at-least-once
+  dedup:
+    per_delivery: X-Cerby-Delivery + X-Cerby-Attempt
+    per_event: event_id
+    anti_pattern: Do not deduplicate on payload content, URL, or signature equality.
+  retry_policy:
+    max_attempts: 6
+    initial_interval_seconds: 60
+    backoff_multiplier: 4
+    approximate_schedule: [1m, 4m, 16m, 64m, 4.3h]
+    max_interval_hours: 6
+    hard_deadline_hours: 24
+  response_handling:
+  - receiver_returns: 2xx
+    behavior: Delivery complete.
+  - receiver_returns: 408, 429, or 503 with Retry-After
+    behavior: Retried. Cerby honors Retry-After, clamped to one hour.
+  - receiver_returns: any other 4xx
+    behavior: Fail-fast. Dead-lettered immediately, not retried.
+  - receiver_returns: 5xx, timeout, or TCP error
+    behavior: Retried with standard backoff.
+  guidance: Respond 2xx quickly and process the event asynchronously.
+
+channels:
+- transport: https
+  description: Standard JSON envelope delivered to any HTTPS endpoint.
+- transport: slack-incoming-webhook
+  host_trigger: hooks.slack.com
+  description: >-
+    Cerby delivers a Slack Block Kit message instead of the standard envelope.
+    The Block Kit message is a lossy subset — data.action, data.automation_link,
+    and other data fields are omitted.
+  severity_colors: {success: '#2EB67D', failure: '#D50200'}
+
+events:
+- name: account.created
+  domain: account
+  data: [account_id, domain, vault_id, requestor_id]
+- name: account.deleted
+  domain: account
+  data: [account_id, requestor_id]
+  status: not-delivered-this-release
+- name: account.disabled
+  domain: account
+  data: [account_id, requestor_id]
+- name: account.enabled
+  domain: account
+  data: [account_id, requestor_id]
+- name: account.credentials.updated
+  domain: account
+  data: [account_id, application, credentials_identifier]
+  pii: credentials_identifier is the username or email.
+- name: account.credentials.rotated
+  domain: account
+  data: [account_id, application, credentials_identifier]
+- name: account.credentials.rotation_failed
+  domain: account
+  data: [account_id, application, automation_job_id, automation_link]
+  carries_error: true
+  status: provisional
+- name: account.access.shared
+  domain: account
+  data: [account_id, account_name, new_teams_ids, role]
+  pii: account_name
+  note: May co-fire with account.access.shared_with_user.
+- name: account.access.shared_with_user
+  domain: account
+  data: [account_id, account_name, new_users_ids, role]
+  note: May co-fire with account.access.shared.
+- name: account.login.failed
+  domain: account
+  data: [account_id, application, automation_job_id, automation_link]
+  carries_error: true
+  status: provisional
+- name: account.mfa.enabled
+  domain: account
+  data: [account_id, application, automation_job_id]
+  status: provisional
+- name: account.mfa.disabled
+  domain: account
+  data: [account_id, provider]
+- name: account.mfa.setup_failed
+  domain: account
+  data: [account_id, application, automation_job_id, automation_link]
+  carries_error: true
+  status: provisional
+- name: automation.users.provisioned
+  domain: automation
+  data: [automation_job_id, application, account_id, automation_link, child_count, child_failure_count]
+  note: Rollup — one event per execution group. child counts are null this release.
+- name: automation.users.deprovisioned
+  domain: automation
+  data: [automation_job_id, application, account_id, automation_link, child_count, child_failure_count]
+  note: Rollup.
+- name: automation.users.role_updated
+  domain: automation
+  data: [automation_job_id, application, account_id, automation_link, child_count, child_failure_count]
+  note: Rollup.
+- name: automation.password.rotated
+  domain: automation
+  data: [automation_job_id, application, account_id, automation_link]
+- name: automation.mfa.enabled
+  domain: automation
+  data: [automation_job_id, application, account_id, automation_link]
+- name: automation.universal_logout.completed
+  domain: automation
+  data: [automation_job_id, application, account_id, automation_link]
+  status: provisional
+- name: automation.succeeded
+  domain: automation
+  data: [automation_job_id, application, account_id, automation_link, action]
+  note: Always-fire catch-all. Co-fires alongside the matching specific success event.
+- name: automation.failed
+  domain: automation
+  data: [automation_job_id, application, account_id, automation_link, action, remediation]
+  carries_error: true
+  error_catalog: errors/cerby-automation-failure-codes.yml
+
+reserved_events:
+  note: Reserved for a future release. Subscribing currently returns HTTP 400.
+  events:
+  - account.vault.assigned
+  - account.trusted_session.established
+  - automation.users.attributes_updated
+  - automation.users.synced
+
+limitations_published:
+- account.deleted is available for subscription but not delivered in this release.
+- Webhooks are not available for Canada-resident workspaces (ca-central-1).
+- trace_id and correlation_id are reserved and always null; most events are standalone.
+- Several event types are provisional and may not arrive in production.
+
+summary:
+  event_types: 21
+  reserved_event_types: 4
+  domains: [account, automation]
+  provisional: 5
+
+x-evidence:
+- url: https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver.md
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://api.cerby.com/asyncapi.yaml
+  http_status: 404
+  fetched: '2026-08-09'
+- url: https://help.cerby.com/asyncapi.yaml
+  http_status: 404
+  fetched: '2026-08-09'

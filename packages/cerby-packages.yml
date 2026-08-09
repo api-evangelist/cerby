@@ -1,0 +1,67 @@
+generated: '2026-08-09'
+method: searched
+source: registry search + https://help.cerby.com/developer-tools/readme
+packages: []
+finding: >-
+  Cerby publishes NO first-party client library in any public package registry.
+  This is an honest zero, not an unchecked box: the registries below were each
+  queried directly.
+registries_searched:
+- registry: npm
+  query: https://registry.npmjs.org/-/v1/search?text=cerby
+  result: no first-party package
+- registry: pypi
+  query: https://pypi.org/pypi/cerby/json
+  status: 404
+- registry: pypi
+  query: https://pypi.org/pypi/cerby-sdk/json
+  status: 404
+- registry: rubygems
+  query: https://rubygems.org/api/v1/gems/cerby.json
+  status: 404
+- registry: crates.io
+  query: https://crates.io/api/v1/crates/cerby
+  result: no first-party crate
+- registry: packagist
+  query: https://packagist.org/search.json?q=cerby
+  result: no first-party package
+- registry: github
+  query: https://api.github.com/orgs/cerbyinc/repos
+  result: 3 public repositories, none a Cerby API client
+first_party_github_org:
+  org: cerbyinc
+  url: https://github.com/cerbyinc
+  name: Cerby
+  blog: https://cerby.com
+  public_repos: 3
+  repositories:
+  - name: cerby-aws-ses-integration
+    language: Python
+    description: Public repository for SES integration
+  - name: app-select-take-home
+    language: JavaScript
+  - name: aws-iam-roles-anywhere-sidecar-credential-helper
+    language: Go
+  note: >-
+    None of these is a client SDK for the Cerby API. Note that github.com/cerby
+    is an UNRELATED personal account (a Danish student's coursework) and must
+    not be attributed to the company.
+distributed_binaries:
+- name: Cerby CLI
+  official: true
+  registries: none
+  distribution: in-product download from an authenticated Cerby workspace only
+  platforms: [windows, macos (Apple Silicon only), linux]
+  see: cli/cerby-cli.yml
+gap: >-
+  An identity API with 17 scopes, a JSON:API envelope, and a signed event
+  surface, integrated from Python and Node.js reference code in Cerby's own
+  webhook docs — and no packaged client in any language. The webhook
+  verification samples are the closest thing Cerby ships to an SDK.
+x-evidence:
+- url: https://api.github.com/orgs/cerbyinc
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://pypi.org/pypi/cerby/json
+  http_status: 404
+  fetched: '2026-08-09'

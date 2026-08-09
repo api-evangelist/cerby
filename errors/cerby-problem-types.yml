@@ -1,0 +1,93 @@
+generated: '2026-08-09'
+method: searched
+source: https://developer.cerby.com/#response-status-codes
+format: custom
+format_note: >-
+  Not RFC 9457. Cerby returns application/json with a top-level `errors` array
+  whose members carry code, title, detail, status, and meta. There is no
+  application/problem+json media type and no dereferenceable `type` URI.
+envelope:
+  root: errors
+  cardinality: array
+  member_fields:
+    code: Stable machine identifier for the error class.
+    title: Short label; mirrors code in the published examples.
+    detail: Human-readable description of what went wrong.
+    status: The HTTP status. String on 400 examples, number on 401/404 examples.
+    meta: Structured context; null on 401/404, populated on validation errors.
+  validation_meta_fields:
+    loc: Path array locating the offending input.
+    msg: The validation message.
+    type: The validator type identifier.
+    ctx: Extra context, such as the permitted enum values.
+problems:
+- status: 200
+  title: OK
+  detail: The request has succeeded.
+  class: success
+- status: 201
+  title: Created
+  detail: The request was successful, and a resource was created in Cerby.
+  class: success
+- status: 204
+  title: No content
+  detail: The request was successful.
+  class: success
+- status: 400
+  code: validation_error
+  title: Bad request
+  detail: >-
+    The server could not interpret the request due to invalid syntax or missing
+    parameters.
+  remediation: Review your request and correct it.
+  meta_populated: true
+  observed_validator_types:
+  - type_error.enum
+  - too_short
+  - extra_forbidden
+  examples:
+  - "value is not a valid enumeration member; permitted: 'enabled', 'disabled'"
+  - List should have at least 1 item after validation, not 0
+  - Extra inputs are not permitted
+- status: 401
+  code: unauthorized
+  title: Unauthorized
+  detail: Unable to access resource.
+  cause: >-
+    The request lacks valid authentication credentials for the target resource.
+    Also returned when the API key is expired or does not carry the scopes the
+    endpoint requires, and when the key's user has no visibility of the target
+    account.
+  remediation: Verify the expiration of your Cerby API key or generate a new one.
+- status: 403
+  title: Forbidden
+  detail: The API key has no permission to perform the request.
+  remediation: Verify that your API key has the required scopes.
+- status: 404
+  code: not_found
+  title: Not found
+  detail: Resource not found.
+  cause: >-
+    The origin server did not find a current representation for the target
+    resource, or is not willing to disclose that one exists.
+  remediation: Verify your request.
+  note: Applies to invalid requests when retrieving items by ID.
+- status: 409
+  title: Conflict
+  detail: The request conflicts with the current state of the resource.
+- status: 429
+  title: Too many requests
+  detail: The user has sent too many requests in a given amount of time.
+  remediation: Retry in five minutes.
+coverage:
+  documented_status_codes: 9
+  server_error_documented: false
+  note: >-
+    Cerby documents only 2xx and 4xx classes. No 5xx behavior is published for
+    the REST API.
+related:
+- errors/cerby-automation-failure-codes.yml
+x-evidence:
+- url: https://developer.cerby.com/
+  http_status: 200
+  fetched: '2026-08-09'

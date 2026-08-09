@@ -1,0 +1,177 @@
+generated: '2026-08-09'
+method: searched
+source: https://developer.cerby.com/
+docs:
+- https://developer.cerby.com/#requests
+- https://developer.cerby.com/#responses
+- https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver
+note: >-
+  Cerby publishes no OpenAPI document. Every convention below is quoted or
+  summarized from the published developer portal and help-center articles.
+
+api:
+  style: REST
+  transport: HTTPS only
+  media_type: application/json
+  base_url: https://{my-workspace}.cerby.com/api/v1/
+  url_template: https://{my-workspace}.cerby.com/api/v1/{resource}/{path-parameter}?{query-parameter}={value}
+  tenancy: >-
+    The workspace is part of the hostname, not a header or path segment. Each
+    customer calls their own subdomain, so there is no single shared API host.
+  methods: [GET, POST, PATCH, PUT, DELETE]
+  stated_standard: >-
+    The portal states the API "follows RESTful principles and the OpenAPI 3.0
+    Specifications" — but no OpenAPI document is published for download.
+
+authentication:
+  style: api-key-header
+  header: X-API-Key
+  scoped: true
+  see: authentication/cerby-authentication.yml
+
+envelope:
+  shape: JSON:API-style
+  top_level_keys: [data, links, meta]
+  data:
+    description: The primary information the client requested.
+    fields: [id, type, attributes]
+  links:
+    fields:
+      self: The self reference to the endpoint you are calling.
+      next: The next page of results.
+      previous: The previous page of results.
+    note: Link URIs are percent-encoded in practice.
+  meta:
+    fields:
+      page.maxSize: The maximum number of items that can be returned per page.
+      page.total: The total number of items available across all pages.
+
+pagination:
+  style: page-number
+  params:
+    - name: page[number]
+      description: The page number to retrieve in the paginated result set.
+    - name: page[size]
+      description: The number of items to retrieve per page.
+  response_fields: [meta.page.maxSize, meta.page.total, links.next, links.previous, links.self]
+  applicability: >-
+    Not every endpoint accepts these parameters — the portal directs readers to
+    the per-endpoint documentation.
+
+filtering:
+  style: bracketed
+  params:
+    - name: filter[application]
+      description: Comma-separated list of applications to filter their associated accounts.
+    - name: filter[secretType]
+      description: The type of secret to retrieve from an account.
+      values: [password]
+    - name: filter[status]
+      description: The status value to filter accounts.
+      values: [enabled, disabled]
+    - name: filter
+      description: Free-form filter used on the users collection (for example an email address).
+  search:
+    param: search
+    used_on: integration and asset unmatched-user endpoints
+
+sorting:
+  param: sort
+  description: Sorts results alphabetically on an attribute.
+  direction_convention: >-
+    A leading minus character changes direction; the portal documents
+    "sort=-created_at" as its ascending example.
+
+idempotency:
+  rest_writes:
+    supported: false
+    detail: >-
+      Cerby documents no idempotency key for POST/PATCH/PUT requests to the
+      public REST API. Retrying a write is not documented as safe.
+  webhook_delivery:
+    supported: true
+    header: Idempotency-Key
+    header_note: Provided as a convenience alias for X-Cerby-Delivery.
+    delivery_guarantee: at-least-once
+    dedup_keys:
+      per_delivery:
+        header: X-Cerby-Delivery
+        detail: >-
+          Constant across all retry attempts for the same event and webhook.
+          Combine with X-Cerby-Attempt, which rises on each retry.
+      per_event:
+        field: event_id
+        format: UUIDv7
+        detail: >-
+          Stable across retries and across different webhooks or delivery
+          channels; use it to collapse the same logical event.
+    anti_pattern_published: >-
+      Do not deduplicate on payload content, URL, or signature equality.
+    see: asyncapi/cerby-webhooks.yml
+  summary: >-
+    Cerby ships a real, documented idempotency contract on the EVENT surface —
+    an Idempotency-Key header, named dedup keys, and explicit at-least-once
+    semantics — and no idempotency contract on the REST write surface.
+
+rate_limiting:
+  signaled_by: HTTP 429 Too Many Requests
+  published_limits: none
+  retry_guidance: "Retry in five minutes."
+  headers_documented: none
+  note: >-
+    Cerby documents the 429 status and a fixed retry instruction but publishes
+    no quota numbers and no X-RateLimit / RateLimit response headers.
+
+request_tracing:
+  api: none documented
+  webhooks:
+    fields: [trace_id, correlation_id]
+    status: >-
+      Reserved. Both are always null in the current release. The one available
+      correlation is automation_job_id, which pairs an automation.failed event
+      with its later automation.succeeded event.
+
+versioning:
+  api:
+    scheme: uri-path
+    current: v1
+    location: /api/v1/
+  webhooks:
+    scheme: envelope field
+    field: envelope_version
+    current: '1.0'
+    forward_compatibility_rules:
+    - Ignore unknown fields; new top-level keys may appear without a version bump.
+    - Tolerate null on trace_id, correlation_id, error.message, and error.user_action.
+    - Do not assume field ordering.
+    - Treat unknown error.code and error.user_action values as opaque strings.
+  see: lifecycle/cerby-lifecycle.yml
+
+errors:
+  envelope:
+    root: errors
+    cardinality: array
+    fields: [code, title, detail, status, meta]
+    note: >-
+      status is a string on 400 validation errors and a number on 401/404 in the
+      published examples — the shape is not consistent across classes.
+  validation_detail:
+    field: meta.loc
+    description: >-
+      A path array locating the offending input, for example
+      ["data","attributes","entitlements"] or ["filter[status]", 0].
+  problem_json: false
+  see: errors/cerby-problem-types.yml
+
+field_expansion:
+  supported: not documented
+metadata_fields:
+  supported: not documented
+
+x-evidence:
+- url: https://developer.cerby.com/
+  http_status: 200
+  fetched: '2026-08-09'
+- url: https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver.md
+  http_status: 200
+  fetched: '2026-08-09'
