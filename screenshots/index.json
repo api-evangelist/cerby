@@ -1,0 +1,19 @@
+[
+  {
+    "repo": "cerby",
+    "captured_at": "2026-08-17T080826",
+    "source_url": "https://developer.cerby.com/",
+    "source_type": "DeveloperPortal",
+    "file": "cerby-2026-08-17T080826.png",
+    "bytes": 85373
+  },
+  {
+    "repo": "cerby",
+    "captured_at": "2026-08-17T083439",
+    "source_url": "https://cerby.com",
+    "source_type": "root-domain",
+    "file": "cerby-2026-08-17T083439.png",
+    "bytes": 149939,
+    "capture": "playwright-local"
+  }
+]
