@@ -25,6 +25,17 @@ tags:
 - Identity Governance
 - Nonfederated Applications
 - Automation
+- Webhook
+tags_raw:
+- Identity
+- Access Management
+- Security
+- Password Management
+- Provisioning
+- SCIM
+- Identity Governance
+- Nonfederated Applications
+- Automation
 - Webhooks
 apis:
 - aid: cerby:cerby-api
@@ -67,6 +78,10 @@ apis:
   humanURL: https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver
   baseURL: https://my-workspace.cerby.com/api/v1/
   tags:
+  - Webhook
+  - Event
+  - Identity
+  tags_raw:
   - Webhooks
   - Events
   - Identity
