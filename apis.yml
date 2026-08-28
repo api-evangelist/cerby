@@ -9,6 +9,17 @@ description: Cerby is an identity, access, and password management platform for 
   users, teams, integrations, jobs, and vaults — plus a signed webhook notification service, a cross-platform
   CLI, and SCIM 2.0 endpoints for provisioning from Okta, Entra ID, and OneLogin.
 url: https://raw.githubusercontent.com/api-evangelist/cerby/refs/heads/main/apis.yml
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://www.cerby.com/hubfs/Logos/Cerby%20Favicon%20-%20Alternate.png
 x-type: company
 x-source: harvest:secondary-market
