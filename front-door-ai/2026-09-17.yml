@@ -1,0 +1,27 @@
+# Front Door AI Index — cerby — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: cerby
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: www.cerby.com
+  final_host: www.cerby.com
+  ownership: own
+  owner: cerby
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 4
+  host_score: 4
+  density: 4.89
+  words: 818
+  tiers:
+    agentic: 2
+    core: 2
+    model: 0
+  ambiguous: 7
+  top_terms:
+    automation: 7
+    AI: 2
+    agentic: 2
