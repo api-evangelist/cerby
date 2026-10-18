@@ -42,7 +42,7 @@ created: '2026-08-09'
 modified: '2026-10-06'
 tags:
 - Identity
-- Access Management
+- Identity and Access Management
 - Security
 - Password Management
 - Provisioning
@@ -74,6 +74,11 @@ apis:
   humanURL: https://developer.cerby.com/
   baseURL: https://my-workspace.cerby.com/api/v1/
   tags:
+  - Identity
+  - Identity and Access Management
+  - Secrets
+  - Provisioning
+  tags_raw:
   - Identity
   - Access Management
   - Secrets
