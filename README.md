@@ -64,37 +64,111 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Cerby is an identity, access, and password management platform for nonfederated and disconnected
-applications — the enterprise software that does not support SAML, SCIM, or an integration API of its
-own. Cerby extends existing IAM, IGA, and PAM systems to those applications through browser and
-robotic automation, adding provisioning and deprovisioning, credential rotation, MFA enrollment, and
-access governance where no standards-based integration exists.
+Cerby is an identity, access, and password management platform for nonfederated and disconnected applications — the enterprise software that does not support SAML, SCIM, or an integration API of its own. Cerby extends existing IAM, IGA, and PAM systems to those applications through browser and robotic automation, adding provisioning and deprovisioning, credential rotation, MFA enrollment, and access governance where no standards-based integration exists. Cerby publishes a public RESTful API (JSON:API-style envelope, X-API-Key authentication, scoped API keys) over eight resources — accounts, secrets, collections, users, teams, integrations, jobs, and vaults — plus a signed webhook notification service, a cross-platform CLI, and SCIM 2.0 endpoints for provisioning from Okta, Entra ID, and OneLogin.
 
-## Public API surface
+**Areas:** Identity · Identity and Access Management · Security · Password Management · Provisioning · SCIM · Identity Governance · Nonfederated Applications · Automation · Webhook · Identity Federation
 
-| Surface | Where |
+## Cerby on APIs.io
+
+Everything profiled for Cerby is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/cerby/](https://apis.io/providers/cerby/)** — or go straight to one of the APIs or properties below.
+
+### APIs (3)
+
+- [Cerby API](https://apis.io/apis/cerby/cerby-api/) — The public Cerby REST API. Programmatic access to accounts, secrets, collections, users, teams, integrations, jobs, and vaults in a Cerby workspace.…
+- [Cerby Webhooks](https://apis.io/apis/cerby/cerby-webhooks/) — Cerby's webhook notification service delivers real-time signed HTTPS events for account, credential, MFA, and automation lifecycle changes. Deliveries carry…
+- [Cerby SCIM 2.0](https://apis.io/apis/cerby/cerby-scim/) — Cerby exposes SCIM 2.0 endpoints so an identity provider can automatically provision and deprovision users and groups into a Cerby workspace. Documented for…
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Cerby Webhooks](https://apis.io/asyncapis/cerby/cerby-webhooks/)
+
+#### Security (4)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Cerby Authentication](https://apis.io/security/cerby/cerby-authentication/)
+- [Cerby Domain Security](https://apis.io/security/cerby/cerby-domain-security/)
+- [Cerby Trust Center](https://apis.io/security/cerby/cerby-trust-center/)
+- [Cerby Vulnerability Disclosure](https://apis.io/security/cerby/cerby-vulnerability-disclosure/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Cerby Scopes](https://apis.io/scopes/cerby/cerby-scopes/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.cerby.com/)
+- [Documentation](https://help.cerby.com/developer-tools/readme)
+- [Getting started](https://help.cerby.com/getting-started)
+- [API reference](https://developer.cerby.com/#api-reference)
+- [Pricing](https://www.cerby.com/contact-us)
+- [Sign up](https://app.cerby.com/)
+- [Support](https://help.cerby.com/)
+- [Blog](https://www.cerby.com/blog)
+- [GitHub](https://github.com/cerbyinc)
+- [Status](https://status.cerby.com/)
+
+## API Evangelist rating
+
+**Kin Score 48.4** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
 |---|---|
-| Cerby API (REST) | https://developer.cerby.com/ |
-| Cerby Webhooks | https://help.cerby.com/developer-tools/cerby-webhooks/implement-a-webhook-receiver |
-| Cerby SCIM 2.0 | https://api.cerby.com/v1/scim/v2 |
-| Cerby CLI | https://help.cerby.com/developer-tools/cerby-cli/explore-the-cerby-cli |
-| Developer tools hub | https://help.cerby.com/developer-tools/readme |
-| Status | https://status.cerby.com/ |
-| Trust center | https://trust.cerby.com/ |
-| GitHub | https://github.com/cerbyinc |
+| Discoverability | 78.6 |
+| Contract quality | 39.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 52.6 |
+| Developer ergonomics | 60.7 |
+| Access clarity | 31.6 |
 
-The Cerby API is a JSON:API-style REST API over eight resources — accounts, secrets, collections,
-users, teams, integrations, jobs, and vaults — authenticated with a scoped `X-API-Key` and served
-per-workspace at `https://{my-workspace}.cerby.com/api/v1/`.
+**Agent readiness 25.9** — agent-aware
 
-## Notes from this profile
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | documented (partial credit) |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | — |
+| Event Surface Described | yes |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | na |
 
-- **No OpenAPI is published.** The developer portal states the API "follows RESTful principles and
-  the OpenAPI 3.0 Specifications", but the reference is a static Slate page and no spec is
-  downloadable from any host probed.
-- **No AsyncAPI is published**, though the webhook contract is documented in unusual depth — signed
-  deliveries, 21 event types, a published retry policy, and CI-tested reference verifiers.
-- **No `/.well-known/` document exists** on any Cerby host, including no `security.txt`.
-- The SOC 2 / ISO 27001 names on cerby.com/security belong to Cerby's **cloud provider**, not to
-  Cerby. See `security/cerby-trust-center.yml`.
-- `github.com/cerby` is an unrelated personal account. The company org is `github.com/cerbyinc`.
+**Regulatory alignment 37.3** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/cerby/](https://apis.io/providers/cerby/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Cerby: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/cerby/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
